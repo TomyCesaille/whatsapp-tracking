@@ -14,16 +14,17 @@ let client = new InfluxDB({ url: 'http://localhost:9999', token: process.env.INF
 const writeApi = client.getWriteApi(process.env.INFLUXDB_ORG, process.env.INFLUXDB_BUCKET);
 
 (async () => {
-    const browser = await puppeteer.launch(
-        { headless: false, userDataDir: 'data/userdata' }
-    );
+    const browser = await puppeteer.launch({ 
+        headless: false, // No headless to scan the QR code.
+        userDataDir: 'data/userdata' // Persist the session.
+    });
 
     const page = await browser.newPage();
     await page.goto('https://web.whatsapp.com/');
     await page.waitFor(5000);
 
     console.log('Awaiting/Checking peering with WhatsApp phone');
-    await page.waitFor('#side', { timeout: 60000 }).then(() => {
+    await page.waitFor('#side', { timeout: 60000 }).then(() => { // Scan the QR code within the next minute.
         console.log('Connected !');
     }).catch((res) => {
         console.log('Not connected !', res);
@@ -31,11 +32,11 @@ const writeApi = client.getWriteApi(process.env.INFLUXDB_ORG, process.env.INFLUX
     })
     await page.waitFor(1000);
 
-    await page.focus('._2S1VP');
+    await page.focus('._2S1VP'); // Focus search input form.
     await page.keyboard.type(contactTarget, { delay: 100 });
     await page.waitFor(6000);
 
-    let contactElt = (await page.$x(`//*[@class="_25Ooe" and . = "${contactTarget}"]`))[0];
+    let contactElt = (await page.$x(`//*[@class="_25Ooe" and . = "${contactTarget}"]`))[0]; // Select the best result.
     contactElt.click();
 
     while (true) {
@@ -51,7 +52,7 @@ const writeApi = client.getWriteApi(process.env.INFLUXDB_ORG, process.env.INFLUX
             console.log(`No status available for ${contactTarget}.`);
             continue;
         }
-        let status = await statusElt.evaluate(x => x.textContent);
+        let status = await statusElt.evaluate(x => x.textContent);  // `last seen today at 13:15` format.
         console.log(`Status for ${contactTarget} is '${status}'.`);
         let lastSeenDate = chrono.parseDate(status);
         console.log(`Last seen date parsed: ${lastSeenDate}`);
