@@ -1,7 +1,9 @@
 # whatsapp-tracking
 
 Proof of concept about tracking contacts in WhatsApp.
-Check out my [blog entry](https://jorislacance.fr/blog/) for in-depth info.
+Check out my [blog entry](https://jorislacance.fr/blog/2020/04/01/whatsapp-tracking) for in-depth info.
+
+![grafana](https://i.imgur.com/MMq8q4u.png)  
 
 ## architecture
 
@@ -64,6 +66,4 @@ Not sure if the scraper runs on Linux...
 
 ## todo
 
-* Update the link to portfolio blog entry
-* Add an image in this readme
 * Dockerize the scraper too ? Hardly with the peering procedure that requires us to scan the QR code.
