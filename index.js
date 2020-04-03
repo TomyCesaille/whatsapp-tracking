@@ -4,12 +4,14 @@ const { InfluxDB, FluxTableMetaData } = require('@influxdata/influxdb-client')
 require('dotenv').config()
 console.log(`CONTACT_TARGET=${process.env.CONTACT_TARGET}`);
 console.log(`INFLUXDB_TOKEN=${process.env.INFLUXDB_TOKEN}`);
+console.log(`INFLUXDB_ORG=${process.env.INFLUXDB_ORG}`);
+console.log(`INFLUXDB_BUCKET=${process.env.INFLUXDB_BUCKET}`);
 
 // The contact name to track (mind the case).
 const contactTarget = process.env.CONTACT_TARGET;
 
 let client = new InfluxDB({ url: 'http://localhost:9999', token: process.env.INFLUXDB_TOKEN });
-const writeApi = client.getWriteApi('initial-org', 'whatsapp-tracking');
+const writeApi = client.getWriteApi(process.env.INFLUXDB_ORG, process.env.INFLUXDB_BUCKET);
 
 (async () => {
     const browser = await puppeteer.launch(
