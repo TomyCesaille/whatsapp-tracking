@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+  influxdb:
+    image: quay.io/influxdb/influxdb:2.0.0-beta
+    command: --reporting-disabled
+    ports:
+      - "9999:9999"
+    volumes:
+      - ./data/influxdb:/root/.influxdbv2
+    logging:
+      options:
+        max-size: "50m"
+        max-file: "10"
+    restart: unless-stopped
+
+  grafana:
+      image: grafana/grafana:6.7.2
+      ports:
+        - "3000:3000"
+      volumes:
+        - ./data/grafana:/var/lib/grafana
+      environment:
+        - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource,grafana-influxdb-flux-datasource,natel-discrete-panel,petrslavotinek-carpetplot-panel,vonage-status-panel,flant-statusmap-panel,neocat-cal-heatmap-panel
+      logging:
+        options:
+          max-size: "50m"
+          max-file: "10"
+      restart: unless-stopped

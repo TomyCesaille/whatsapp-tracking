@@ -1,0 +1,17 @@
+{
+  "name": "whatsapp-tracking",
+  "version": "1.0.0",
+  "description": "whatsapp-tracking",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "joris la cancellera",
+  "license": "ISC",
+  "dependencies": {
+    "@influxdata/influxdb-client": "^1.1.0",
+    "chrono-node": "^1.4.4",
+    "dotenv": "^8.2.0",
+    "puppeteer": "^2.1.1"
+  }
+}
