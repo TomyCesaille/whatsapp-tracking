@@ -20,7 +20,7 @@ docker-compose up -d
 
 ### influxDB setup
 
-* Go to [https://localhost:9999](https://localhost:9999), setup an admin account
+* Go to [http://localhost:9999](http://localhost:9999), setup an admin account
   * Name the initial organization like you want, `initial-org` for instance
   * Name the initial bucket anything, like `yolo`, we won't use the initial one because there will be sample data in it
 * Create a new bucket `whatsapp-tracking`
@@ -29,7 +29,7 @@ docker-compose up -d
 
 ### grafana setup
 
-* Go to [https://localhost:3000](https://localhost:3000), setup an admin account
+* Go to [http://localhost:3000](http://localhost:3000), setup an admin account
 * Add the data source using the plugin `Flux (InfluxDB) [BETA]` (for InfluxDB 2.0)
   * URL: `http://influxdb:9999`
   * with credentials: `true`
