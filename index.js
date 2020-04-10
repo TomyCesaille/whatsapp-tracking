@@ -14,7 +14,7 @@ let client = new InfluxDB({ url: 'http://localhost:9999', token: process.env.INF
 const writeApi = client.getWriteApi(process.env.INFLUXDB_ORG, process.env.INFLUXDB_BUCKET);
 
 (async () => {
-    const browser = await puppeteer.launch({ 
+    const browser = await puppeteer.launch({
         headless: false, // No headless to scan the QR code.
         userDataDir: 'data/userdata' // Persist the session.
     });
@@ -54,6 +54,12 @@ const writeApi = client.getWriteApi(process.env.INFLUXDB_ORG, process.env.INFLUX
         }
         let status = await statusElt.evaluate(x => x.textContent);  // `last seen today at 13:15` format.
         console.log(`Status for ${contactTarget} is '${status}'.`);
+
+        if (status == "click here for contact info") {
+            console.log(`'click here for contact info' case for ${contactTarget}.`);
+            continue;
+        }
+
         let lastSeenDate = chrono.parseDate(status);
         console.log(`Last seen date parsed: ${lastSeenDate}`);
 
