@@ -1,30 +1,42 @@
 const puppeteer = require('puppeteer');
 const chrono = require('chrono-node');
-const { InfluxDB, FluxTableMetaData } = require('@influxdata/influxdb-client')
+const { InfluxDB } = require('@influxdata/influxdb-client')
 require('dotenv').config()
 console.log(`CONTACT_TARGET=${process.env.CONTACT_TARGET}`);
 console.log(`INFLUXDB_TOKEN=${process.env.INFLUXDB_TOKEN}`);
 console.log(`INFLUXDB_ORG=${process.env.INFLUXDB_ORG}`);
 console.log(`INFLUXDB_BUCKET=${process.env.INFLUXDB_BUCKET}`);
+console.log(`ISDOCKER=${process.env.ISDOCKER}`);
 
 // The contact name to track (mind the case).
 const contactTarget = process.env.CONTACT_TARGET;
 
-let client = new InfluxDB({ url: 'http://localhost:9999', token: process.env.INFLUXDB_TOKEN });
+let docker = process.env.ISDOCKER === 'TRUE';
+let influxUrl = docker ? `http://influxdb:9999` : 'http://localhost:9999';
+let userDataDir = docker ? `/usr/data/userdata` : 'data/userdata';
+let args = docker ? ['--no-sandbox', '--disable-setuid-sandbox'] : [];
+let screenshotPath = docker ? '/usr/data/screenshots/screenshot.png' : 'data/screenshots/screenshot.png';
+
+let client = new InfluxDB({ url: influxUrl, token: process.env.INFLUXDB_TOKEN });
 const writeApi = client.getWriteApi(process.env.INFLUXDB_ORG, process.env.INFLUXDB_BUCKET);
 
 (async () => {
     const browser = await puppeteer.launch({
-        headless: false, // No headless to scan the QR code.
-        userDataDir: 'data/userdata' // Persist the session.
+        args: args,
+        headless: true,
+        userDataDir: userDataDir // Persist the session.
     });
 
     const page = await browser.newPage();
+    page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/75.0');
+
     await page.goto('https://web.whatsapp.com/');
-    await page.waitFor(5000);
+    await page.waitFor(10000);
+
+    await page.screenshot({ path: screenshotPath });
 
     console.log('Awaiting/Checking peering with WhatsApp phone');
-    await page.waitFor('#side', { timeout: 60000 }).then(() => { // Scan the QR code within the next minute.
+    await page.waitFor('#side', { timeout: 120000 }).then(() => { // Scan the QR code within the next 2 minutes.
         console.log('Connected !');
     }).catch((res) => {
         console.log('Not connected !', res);

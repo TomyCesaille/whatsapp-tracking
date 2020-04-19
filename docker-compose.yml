@@ -15,15 +15,35 @@ services:
     restart: unless-stopped
 
   grafana:
-      image: grafana/grafana:6.7.2
-      ports:
-        - "3000:3000"
-      volumes:
-        - ./data/grafana:/var/lib/grafana
-      environment:
-        - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource,grafana-influxdb-flux-datasource,natel-discrete-panel,petrslavotinek-carpetplot-panel,vonage-status-panel,flant-statusmap-panel,neocat-cal-heatmap-panel
-      logging:
-        options:
-          max-size: "50m"
-          max-file: "10"
-      restart: unless-stopped
+    image: grafana/grafana:6.7.2
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data/grafana:/var/lib/grafana
+    environment:
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource,grafana-influxdb-flux-datasource,natel-discrete-panel,petrslavotinek-carpetplot-panel,vonage-status-panel,flant-statusmap-panel,neocat-cal-heatmap-panel
+    logging:
+      options:
+        max-size: "50m"
+        max-file: "10"
+    restart: unless-stopped
+
+  scraper:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    shm_size: "1gb"
+    volumes:
+      - ./data/userdatadocker:/usr/data/userdata
+      - ./data/screenshots:/usr/data/screenshots
+    environment:
+      - CONTACT_TARGET=${CONTACT_TARGET}
+      - INFLUXDB_TOKEN=${INFLUXDB_TOKEN}
+      - INFLUXDB_ORG=${INFLUXDB_ORG}
+      - INFLUXDB_BUCKET=${INFLUXDB_BUCKET}
+      - ISDOCKER=TRUE
+    logging:
+      options:
+        max-size: "50m"
+        max-file: "10"
+    restart: unless-stopped
