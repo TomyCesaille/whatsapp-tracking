@@ -8,10 +8,11 @@
   },
   "author": "joris la cancellera",
   "license": "ISC",
+  "repository": "https://github.com/TomyCesaille/whatsapp-tracking",
   "dependencies": {
-    "@influxdata/influxdb-client": "^1.1.0",
-    "chrono-node": "^1.4.4",
+    "@influxdata/influxdb-client": "^1.2.0",
+    "chrono-node": "^1.4.5",
     "dotenv": "^8.2.0",
-    "puppeteer": "^2.1.1"
+    "puppeteer": "^3.0.0"
   }
 }
