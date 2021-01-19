@@ -31,6 +31,32 @@ const writeApi = client.getWriteApi(
 );
 
 (async () => {
+  const page = await loadBrowser();
+
+  await loadWhatsappWebLogin(page);
+
+  while (true) {
+    var contacts = [
+      "Unknown1",
+      "Unknown2",
+      "Unknown3",
+      "Unknown4",
+      "Unknown5",
+      "Unknown6",
+      "Unknown7",
+      "Unknown8",
+      "Unknown9",
+      "Unknown10"
+    ];
+    for (let index = 0; index < contacts.length; index++) {
+      const contact = contacts[index];
+      await scanStatus(page, contact);
+      await page.waitForTimeout(10000);
+    }
+  }
+})();
+
+async function loadBrowser() {
   const browser = await puppeteer.launch({
     args: args,
     headless: headless,
@@ -41,7 +67,10 @@ const writeApi = client.getWriteApi(
   page.setUserAgent(
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0"
   );
+  return page;
+}
 
+async function loadWhatsappWebLogin(page) {
   await page.goto("https://web.whatsapp.com/");
   await page.waitForTimeout(30000);
 
@@ -62,49 +91,55 @@ const writeApi = client.getWriteApi(
       return -1;
     });
   await page.waitForTimeout(1000);
+}
 
-  await page.focus("._1awRl"); // Focus search input form.
-  await page.keyboard.type(contactTarget, { delay: 100 });
+async function scanStatus(page, contactTarget) {
+  console.log(`Scanning status for ${contactTarget}.`);
+  let searchInput = await page.$("._1awRl");
+  await searchInput.click({ clickCount: 3 });
+  await searchInput.press("Backspace");
+  await searchInput.type(contactTarget, { delay: 100 });
   await page.waitForTimeout(6000);
 
   let contactElt = (
     await page.$x(`//*[@class="_3Tw1q" and . = "${contactTarget}"]`)
   )[0]; // Select the best result.
+  if (!contactElt) {
+    console.log(
+      `No whatsApp for ${contactTarget} (or not in phone contacts list).`
+    );
+    return;
+  }
   contactElt.click();
+  await page.waitForTimeout(30000); // Status shows up late sometimes.
 
-  while (true) {
-    await page.waitForTimeout(5000);
+  let statusElt = await page.$("._3Id9P"); // Status text.
 
-    let statusElt = await page.$("._3Id9P"); // Status text
+  let statusAvailable = statusElt ? 1 : 0;
+  let scan = `status,contactName=${contactTarget} statusAvailable=${statusAvailable}u`;
+  writeApi.writeRecord(scan);
 
-    let statusAvailable = statusElt ? 1 : 0;
-    let scan = `status,contactName=${contactTarget} statusAvailable=${statusAvailable}u`;
-    writeApi.writeRecord(scan);
+  if (!statusElt) {
+    console.log(`No status available for ${contactTarget}.`);
+    return;
+  }
+  let status = await statusElt.evaluate(x => x.textContent); // `last seen today at 13:15` format.
+  console.log(`Status for ${contactTarget} is '${status}'.`);
 
-    if (!statusElt) {
-      console.log(`No status available for ${contactTarget}.`);
-      continue;
-    }
-    let status = await statusElt.evaluate(x => x.textContent); // `last seen today at 13:15` format.
-    console.log(`Status for ${contactTarget} is '${status}'.`);
-
-    if (status == "click here for contact info") {
-      console.log(`'click here for contact info' case for ${contactTarget}.`);
-      continue;
-    }
-
-    let lastSeenDate = chrono.parseDate(status);
-    console.log(`Last seen date parsed: ${lastSeenDate}`);
-
-    let offlineSince =
-      lastSeenDate === null
-        ? 0
-        : ((new Date().getTime() - lastSeenDate.getTime()) / 1000).toFixed(0);
-    if (offlineSince < 0) offlineSince = 0;
-
-    let data = `status,contactName=${contactTarget} offlineSince=${offlineSince}u`;
-    writeApi.writeRecord(data);
+  if (status == "click here for contact info") {
+    console.log(`'click here for contact info' case for ${contactTarget}.`);
+    return;
   }
 
-  await browser.close();
-})();
+  let lastSeenDate = chrono.parseDate(status);
+  console.log(`Last seen date parsed: ${lastSeenDate}`);
+
+  let offlineSince =
+    lastSeenDate === null
+      ? 0
+      : ((new Date().getTime() - lastSeenDate.getTime()) / 1000).toFixed(0);
+  if (offlineSince < 0) offlineSince = 0;
+
+  let data = `status,contactName=${contactTarget} offlineSince=${offlineSince}u`;
+  writeApi.writeRecord(data);
+}

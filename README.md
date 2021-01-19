@@ -70,4 +70,4 @@ docker-compose up scraper
 ## todo
 
 - [x] Dockerize the scraper too ? Hardly with the peering procedure that requires us to scan the QR code. -> screenshot through file system
-- [ ] Track several contacts by rotating the contact tracked every hours or so (we will loose the precise `online` state tracking but gather more `last seen` data)
+- [x] Track several contacts by rotating the contact tracked every hours or so (we will loose the precise `online` state tracking but gather more `last seen` data)
