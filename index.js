@@ -36,20 +36,8 @@ const writeApi = client.getWriteApi(
   await loadWhatsappWebLogin(page);
 
   while (true) {
-    var contacts = [
-      "Unknown1",
-      "Unknown2",
-      "Unknown3",
-      "Unknown4",
-      "Unknown5",
-      "Unknown6",
-      "Unknown7",
-      "Unknown8",
-      "Unknown9",
-      "Unknown10"
-    ];
-    for (let index = 0; index < contacts.length; index++) {
-      const contact = contacts[index];
+    for (let index = 0; index <= 99; index++) {
+      const contact = `Unknown${index}`;
       await scanStatus(page, contact);
       await page.waitForTimeout(10000);
     }
@@ -98,7 +86,8 @@ async function scanStatus(page, contactTarget) {
   let searchInput = await page.$("._1awRl");
   await searchInput.click({ clickCount: 3 });
   await searchInput.press("Backspace");
-  await searchInput.type(contactTarget, { delay: 100 });
+  await searchInput.type(contactTarget.slice(0, 5), { delay: 0 });
+  await searchInput.type(contactTarget.slice(5), { delay: 100 });
   await page.waitForTimeout(6000);
 
   let contactElt = (
