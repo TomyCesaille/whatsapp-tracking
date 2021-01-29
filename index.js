@@ -1,5 +1,6 @@
 const puppeteer = require("puppeteer");
 const chrono = require("chrono-node");
+const fs = require("fs");
 const { InfluxDB } = require("@influxdata/influxdb-client");
 require("dotenv").config();
 console.log(`CONTACT_TARGET=${process.env.CONTACT_TARGET}`);
@@ -29,6 +30,12 @@ const writeApi = client.getWriteApi(
   process.env.INFLUXDB_ORG,
   process.env.INFLUXDB_BUCKET
 );
+const fileName = "scan-logs.csv";
+fs.appendFileSync(
+  fileName,
+  "scanDate,contactLabel,HasWhatsapp,LastSeenDate" + "\n"
+);
+let noWhatsappContacts = [];
 
 (async () => {
   const page = await loadBrowser();
@@ -38,7 +45,13 @@ const writeApi = client.getWriteApi(
   while (true) {
     for (let index = 0; index <= 99; index++) {
       const contact = `Unknown${index}`;
-      await scanStatus(page, contact);
+
+      if (noWhatsappContacts.includes(contact)) {
+        continue;
+      }
+
+      let result = await scanStatus(page, contact);
+      fs.appendFileSync(fileName, result + "\n");
       await page.waitForTimeout(10000);
     }
   }
@@ -97,10 +110,11 @@ async function scanStatus(page, contactTarget) {
     console.log(
       `No whatsApp for ${contactTarget} (or not in phone contacts list).`
     );
-    return;
+    noWhatsappContacts.push(contactTarget);
+    return `${new Date().toISOString()},${contactTarget},false,null`;
   }
   contactElt.click();
-  await page.waitForTimeout(30000); // Status shows up late sometimes.
+  await page.waitForTimeout(10000); // Status shows up late sometimes.
 
   let statusElt = await page.$("._3Id9P"); // Status text.
 
@@ -110,14 +124,14 @@ async function scanStatus(page, contactTarget) {
 
   if (!statusElt) {
     console.log(`No status available for ${contactTarget}.`);
-    return;
+    return `${new Date().toISOString()},${contactTarget},true,null`;
   }
   let status = await statusElt.evaluate(x => x.textContent); // `last seen today at 13:15` format.
   console.log(`Status for ${contactTarget} is '${status}'.`);
 
   if (status == "click here for contact info") {
     console.log(`'click here for contact info' case for ${contactTarget}.`);
-    return;
+    return `${new Date().toISOString()},${contactTarget},null,null`;
   }
 
   let lastSeenDate = chrono.parseDate(status);
@@ -131,4 +145,5 @@ async function scanStatus(page, contactTarget) {
 
   let data = `status,contactName=${contactTarget} offlineSince=${offlineSince}u`;
   writeApi.writeRecord(data);
+  return `${new Date().toISOString()},${contactTarget},null,${lastSeenDate.toISOString()}`;
 }
