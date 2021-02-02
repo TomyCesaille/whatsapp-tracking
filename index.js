@@ -43,7 +43,7 @@ let noWhatsappContacts = [];
   await loadWhatsappWebLogin(page);
 
   while (true) {
-    for (let index = 0; index <= 99; index++) {
+    for (let index = 0; index < 5000; index++) {
       const contact = `Unknown${index}`;
 
       if (noWhatsappContacts.includes(contact)) {
@@ -134,8 +134,13 @@ async function scanStatus(page, contactTarget) {
     return `${new Date().toISOString()},${contactTarget},null,null`;
   }
 
-  let lastSeenDate = chrono.parseDate(status);
-  console.log(`Last seen date parsed: ${lastSeenDate}`);
+  let lastSeenDate = undefined;
+  if (status == "online") {
+    lastSeenDate = new Date();
+  } else {
+    lastSeenDate = chrono.parseDate(status);
+    console.log(`Last seen date parsed: ${lastSeenDate}`);
+  }
 
   let offlineSince =
     lastSeenDate === null
@@ -145,5 +150,5 @@ async function scanStatus(page, contactTarget) {
 
   let data = `status,contactName=${contactTarget} offlineSince=${offlineSince}u`;
   writeApi.writeRecord(data);
-  return `${new Date().toISOString()},${contactTarget},null,${lastSeenDate.toISOString()}`;
+  return `${new Date().toISOString()},${contactTarget},true,${lastSeenDate.toISOString()}`;
 }
