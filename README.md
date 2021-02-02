@@ -1,7 +1,11 @@
 # whatsapp-tracking
 
 Proof of concept about tracking contacts in WhatsApp.
-Check out my [blog entry](https://jorislacance.fr/blog/2020/04/01/whatsapp-tracking) for in-depth info.
+
+The `blog1` branch refers to a single user tracking associated to this [blog entry](https://jorislacance.fr/blog/2020/04/01/whatsapp-tracking).
+The `master` branch is associated with the [second blog entry](https://jorislacance.fr/blog/2021/02/05/whatsapp-tracking-2) and deals about mass tracking.
+
+**DISCLAIMER: This is a Proof of Concept to raise awareness and a bit to challenge myself. Don't use the source code to actually track someone, don't be a dick.**
 
 ![grafana](https://i.imgur.com/MMq8q4u.png)
 
