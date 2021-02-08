@@ -11,7 +11,7 @@
   "repository": "https://github.com/TomyCesaille/whatsapp-tracking",
   "dependencies": {
     "@influxdata/influxdb-client": "^1.2.0",
-    "chrono-node": "^1.4.5",
+    "chrono-node": "^2.2.0",
     "dotenv": "^8.2.0",
     "puppeteer": "^3.0.0"
   }
