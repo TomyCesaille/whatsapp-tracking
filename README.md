@@ -2,10 +2,10 @@
 
 Proof of concept about tracking contacts in WhatsApp.
 
-The `blog1` branch refers to a single user tracking associated to this [blog entry](https://jorislacance.fr/blog/2020/04/01/whatsapp-tracking).
-The `master` branch is associated with the [second blog entry](https://jorislacance.fr/blog/2021/02/05/whatsapp-tracking-2) and deals about mass tracking.
+- The `blog1` branch refers to [this blog entry about web scraping exploration](https://jorislacance.fr/blog/2020/04/01/whatsapp-tracking).
+- The `master` branch to the [second blog entry about mass tracking](https://jorislacance.fr/blog/2021-04-16/whatsapp-tracking-2).
 
-**DISCLAIMER: This is a Proof of Concept to raise awareness and a bit to challenge myself. Don't use the source code to actually track someone, don't be a dick.**
+**DISCLAIMER: This is a Proof of Concept to raise awareness. Don't use the source code to track someone, don't be a dick.**
 
 ![grafana](https://i.imgur.com/MMq8q4u.png)
 
@@ -70,8 +70,3 @@ node index.js
 docker-compose up scraper
 # Look at `./data/screenshots/` to get the QR code peering.
 ```
-
-## todo
-
-- [x] Dockerize the scraper too ? Hardly with the peering procedure that requires us to scan the QR code. -> screenshot through file system
-- [x] Track several contacts by rotating the contact tracked every hours or so (we will loose the precise `online` state tracking but gather more `last seen` data)

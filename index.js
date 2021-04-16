@@ -35,7 +35,10 @@ fs.appendFileSync(
   fileName,
   "scanDate,contactLabel,HasWhatsapp,LastSeenDate" + "\n"
 );
-let noWhatsappContacts = [];
+
+const noWhatsappContacts = fs
+  .readFileSync("no-whatsapp.txt", "UTF-8")
+  .split(/\r?\n/);
 
 (async () => {
   const page = await loadBrowser();
@@ -97,10 +100,20 @@ async function loadWhatsappWebLogin(page) {
 async function scanStatus(page, contactTarget) {
   console.log(`Scanning status for ${contactTarget}.`);
   let searchInput = await page.$("._1awRl");
+  let searchInputContent = await searchInput.evaluate(x => x.textContent);
+  if (searchInputContent == "") {
+    await searchInput.type("Unknown", { delay: 100 });
+  }
   await searchInput.click({ clickCount: 3 });
-  await searchInput.press("Backspace");
-  await searchInput.type(contactTarget.slice(0, 5), { delay: 0 });
-  await searchInput.type(contactTarget.slice(5), { delay: 100 });
+  await searchInput.press("End");
+  for (
+    let index = 0;
+    index < (await searchInputContent.length) - "Unknown".length;
+    index++
+  ) {
+    await searchInput.press("Backspace");
+  }
+  await searchInput.type(contactTarget.slice("Unknown".length), { delay: 100 });
   await page.waitForTimeout(6000);
 
   let contactElt = (
@@ -111,6 +124,7 @@ async function scanStatus(page, contactTarget) {
       `No whatsApp for ${contactTarget} (or not in phone contacts list).`
     );
     noWhatsappContacts.push(contactTarget);
+    fs.appendFileSync("no-whatsapp.txt", contactTarget + "\n");
     return `${new Date().toISOString()},${contactTarget},false,null`;
   }
   contactElt.click();
