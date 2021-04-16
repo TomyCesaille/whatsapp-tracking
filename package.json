@@ -10,9 +10,10 @@
   "license": "ISC",
   "repository": "https://github.com/TomyCesaille/whatsapp-tracking",
   "dependencies": {
-    "@influxdata/influxdb-client": "^1.2.0",
-    "chrono-node": "^1.4.5",
+    "@influxdata/influxdb-client": "^1.9.0",
+    "chrono-node": "^2.1.11",
+    "csv-parser": "^3.0.0",
     "dotenv": "^8.2.0",
-    "puppeteer": "^3.0.0"
+    "puppeteer": "^5.5.0"
   }
 }
