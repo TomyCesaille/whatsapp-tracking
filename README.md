@@ -3,7 +3,7 @@
 Proof of concept about tracking contacts in WhatsApp.
 
 - The `blog1` branch refers to [this blog entry about web scraping exploration](https://jorislacance.fr/blog/2020/04/01/whatsapp-tracking).
-- The `master` branch to the [second blog entry about mass tracking](https://jorislacance.fr/blog/2021-04-16/whatsapp-tracking-2).
+- The `master` branch to the [second blog entry about mass tracking](https://jorislacance.fr/blog/2021/04/16/whatsapp-tracking-2).
 
 **DISCLAIMER: This is a Proof of Concept to raise awareness. Don't use the source code to track someone, don't be a dick.**
 
